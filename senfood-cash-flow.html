@@ -1,0 +1,571 @@
+<title>SenFood Cash Flow</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --surface-1: #f6f4ef;
+    --surface-2: #eeece3;
+    --surface-card: #ffffff;
+    --text-primary: #201f1b;
+    --text-secondary: #5c584e;
+    --text-muted: #8c8778;
+    --border: #ddd7c9;
+    --accent: #1c7a5e;
+    --accent-wash: rgba(28,122,94,0.08);
+    --positive: #2f9e5b;
+    --negative: #c94a3d;
+    --positive-wash: rgba(47,158,91,0.08);
+    --negative-wash: rgba(201,74,61,0.08);
+    --cat-fixed: #34415a;
+    --cat-mobile: #4a8a82;
+    --cat-car: #5b7a9e;
+    --cat-fuel: #c98a2e;
+    --shadow: 0 1px 2px rgba(32,31,27,0.04), 0 8px 24px -12px rgba(32,31,27,0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --surface-1: #1a1917;
+      --surface-2: #232220;
+      --surface-card: #211f1c;
+      --text-primary: #f1efe8;
+      --text-secondary: #b8b2a3;
+      --text-muted: #857f70;
+      --border: #3a372e;
+      --accent: #34ab89;
+      --accent-wash: rgba(52,171,137,0.14);
+      --positive: #3fbb72;
+      --negative: #e2685a;
+      --positive-wash: rgba(63,187,114,0.13);
+      --negative-wash: rgba(226,104,90,0.13);
+      --cat-fixed: #6c81a3;
+      --cat-mobile: #63b3a7;
+      --cat-car: #85aad0;
+      --cat-fuel: #e2ab52;
+      --shadow: 0 1px 2px rgba(0,0,0,0.2), 0 8px 24px -12px rgba(0,0,0,0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --surface-1: #1a1917;
+    --surface-2: #232220;
+    --surface-card: #211f1c;
+    --text-primary: #f1efe8;
+    --text-secondary: #b8b2a3;
+    --text-muted: #857f70;
+    --border: #3a372e;
+    --accent: #34ab89;
+    --accent-wash: rgba(52,171,137,0.14);
+    --positive: #3fbb72;
+    --negative: #e2685a;
+    --positive-wash: rgba(63,187,114,0.13);
+    --negative-wash: rgba(226,104,90,0.13);
+    --cat-fixed: #6c81a3;
+    --cat-mobile: #63b3a7;
+    --cat-car: #85aad0;
+    --cat-fuel: #e2ab52;
+    --shadow: 0 1px 2px rgba(0,0,0,0.2), 0 8px 24px -12px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    background: var(--surface-1);
+    color: var(--text-primary);
+    max-width: 1020px;
+    margin: 0 auto;
+    padding: 28px 22px 72px;
+    line-height: 1.5;
+  }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 22px;
+  }
+  header .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  header h1 {
+    font-size: 30px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+  header .subtitle {
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    margin-top: 6px;
+  }
+  header .range-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 14px;
+    white-space: nowrap;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+    margin-bottom: 34px;
+  }
+  .stat-tile {
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .stat-tile .label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+  .stat-tile .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 25px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .stat-tile .delta {
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 5px;
+    color: var(--text-muted);
+  }
+  .delta.up { color: var(--negative); }
+  .delta.down { color: var(--positive); }
+
+  .section { margin-bottom: 38px; }
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .section h2 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+  }
+  .section .hint {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .card {
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    overflow-x: auto;
+    box-shadow: var(--shadow);
+  }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+
+  svg text { font-family: 'DM Sans', system-ui, sans-serif; fill: var(--text-secondary); font-size: 12px; }
+  svg text.axis-label { fill: var(--text-muted); font-size: 10.5px; }
+  svg line.grid { stroke: var(--border); stroke-width: 1; }
+
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .data-table th {
+    text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--text-muted); padding: 9px 12px;
+    border-bottom: 2px solid var(--border); white-space: nowrap;
+  }
+  .data-table th.num { text-align: right; }
+  .data-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); color: var(--text-primary); vertical-align: middle; }
+  .data-table td.num { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+  .data-table td.name { font-weight: 600; white-space: nowrap; }
+  .data-table td.role { display: block; font-weight: 400; font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr.total-row td { font-weight: 700; border-top: 2px solid var(--border); border-bottom: none; background: var(--surface-2); }
+  .data-table tr:hover td { background: var(--accent-wash); }
+  .data-table tr.total-row:hover td { background: var(--surface-2); }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600;
+    padding: 3px 8px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; white-space: nowrap;
+  }
+  .badge.pos { background: var(--positive-wash); color: var(--positive); }
+  .badge.neg { background: var(--negative-wash); color: var(--negative); }
+  .badge.flat { background: var(--surface-2); color: var(--text-muted); }
+
+  .spark-cell { width: 96px; }
+
+  .tooltip {
+    position: absolute; pointer-events: none; background: var(--surface-card);
+    border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px;
+    font-size: 12px; box-shadow: var(--shadow); z-index: 10; white-space: nowrap;
+  }
+  .tooltip .tt-label { color: var(--text-muted); font-size: 11px; }
+  .tooltip .tt-value { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+  footer {
+    margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--border);
+    font-size: 11.5px; color: var(--text-muted); line-height: 1.6;
+  }
+
+  @media (max-width: 620px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    header h1 { font-size: 23px; }
+    header { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+
+<header>
+  <div>
+    <div class="eyebrow">SenFood Skopje · Cash Flow 2026</div>
+    <h1>Трошоци на вработени</h1>
+    <div class="subtitle">Извор: COST ETISHEN, месечни трошковници · Ажурирано 08.09.2026</div>
+  </div>
+  <div class="range-pill" id="rangePill">Април — Август 2026</div>
+</header>
+
+<div class="stats-row" id="stats"></div>
+
+<div class="section">
+  <div class="section-head">
+    <h2>Месечен тренд на трошоци (МКД)</h2>
+    <span class="hint">Плата и придонеси, мобилен, возило/патарини, гориво</span>
+  </div>
+  <div class="card">
+    <div class="legend" id="monthlyLegend"></div>
+    <svg id="monthlyChart" width="100%" height="300" role="img" aria-label="Месечен тренд на вкупни трошоци по категорија"></svg>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-head">
+    <h2>Детален преглед — Август 2026</h2>
+    <span class="hint">Најнов месец</span>
+  </div>
+  <div class="card" style="padding:0;">
+    <table class="data-table" id="detailTable"></table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-head">
+    <h2>Тренд по вработен · Април → Август</h2>
+    <span class="hint">Вкупни трошоци по месец, МКД</span>
+  </div>
+  <div class="card" style="padding:0;">
+    <table class="data-table" id="trendTable"></table>
+  </div>
+</div>
+
+<footer>
+  Вкупните месечни суми вклучуваат и фиксна ставка за интернет/тел. комбо линија (1.920 МКД, не е поврзана со конкретен вработен).
+  Осигурувањето е пресметано врз основа на пријавената плата и останува непроменето месеци наназад освен при промена на пријавата.
+  Оваа страница се ажурира секој месец штом се средат трошковниците за тековниот месец.
+</footer>
+
+<div id="tooltip" class="tooltip" hidden></div>
+
+<script>
+const MONTHS = [
+  { key: 'apr', label: 'Апр', full: 'Април' },
+  { key: 'maj', label: 'Мај', full: 'Мај' },
+  { key: 'jun', label: 'Јун', full: 'Јуни' },
+  { key: 'jul', label: 'Јул', full: 'Јули' },
+  { key: 'aug', label: 'Авг', full: 'Август' },
+];
+
+const DATA = {
+  employees: [
+    { name: 'ERSIN',     role: 'CM / Раководител', m: {
+      apr: { salary:108000, insurance:56979, mobile:3151, car:5180,  fuel:6000,  total:179310 },
+      maj: { salary:108000, insurance:56979, mobile:3151, car:7180,  fuel:7000,  total:182310 },
+      jun: { salary:108000, insurance:56979, mobile:3142, car:1450,  fuel:6000,  total:175571 },
+      jul: { salary:108000, insurance:56979, mobile:3142, car:23084, fuel:8000,  total:199205 },
+      aug: { salary:108000, insurance:56979, mobile:3142, car:1500,  fuel:6000,  total:175621 },
+    }},
+    { name: 'ANDRIJANA', role: 'Администратор / Супервизор', m: {
+      apr: { salary:47500, insurance:22486, mobile:1215, car:1650, fuel:6111, total:78962 },
+      maj: { salary:47500, insurance:22486, mobile:1215, car:1600, fuel:6596, total:79397 },
+      jun: { salary:47500, insurance:22486, mobile:1372, car:1490, fuel:3300, total:76148 },
+      jul: { salary:47500, insurance:22486, mobile:1372, car:1080, fuel:7842, total:80280 },
+      aug: { salary:47500, insurance:22486, mobile:1372, car:1360, fuel:7970, total:80688 },
+    }},
+    { name: 'BILJANA', role: 'Мерчендајзер', m: {
+      apr: { salary:39500, insurance:19769, mobile:1223, car:1400, fuel:0, total:61892 },
+      maj: { salary:39500, insurance:19769, mobile:1223, car:1400, fuel:0, total:61892 },
+      jun: { salary:39500, insurance:19769, mobile:1178, car:1400, fuel:0, total:61847 },
+      jul: { salary:39500, insurance:19769, mobile:1178, car:1400, fuel:0, total:61847 },
+      aug: { salary:39500, insurance:19769, mobile:1178, car:700,  fuel:0, total:61147 },
+    }},
+    { name: 'JULIJA', role: 'Мерчендајзер', m: {
+      apr: { salary:39500, insurance:19769, mobile:1846, car:1800, fuel:11810, total:74725 },
+      maj: { salary:39500, insurance:19769, mobile:1846, car:1560, fuel:8900,  total:71575 },
+      jun: { salary:39500, insurance:19769, mobile:2042, car:1910, fuel:14285, total:77506 },
+      jul: { salary:41500, insurance:19769, mobile:2042, car:1010, fuel:18720, total:83041 },
+      aug: { salary:39500, insurance:19769, mobile:2042, car:1210, fuel:15300, total:77821 },
+    }},
+    { name: 'ZORICA', role: 'Мерчендајзер', m: {
+      apr: { salary:42500, insurance:19769, mobile:1178, car:1750, fuel:3996, total:69193 },
+      maj: { salary:42500, insurance:19769, mobile:1178, car:1220, fuel:4062, total:68729 },
+      jun: { salary:42500, insurance:19769, mobile:1693, car:1210, fuel:5522, total:70694 },
+      jul: { salary:42500, insurance:19769, mobile:1693, car:1760, fuel:8948, total:74670 },
+      aug: { salary:42500, insurance:19769, mobile:1693, car:1670, fuel:3663, total:69295 },
+    }},
+    { name: 'MAGDALENA', role: 'Мерчендајзер', m: {
+      apr: { salary:35800, insurance:17760, mobile:1442, car:1450, fuel:4500, total:60952 },
+      maj: { salary:35800, insurance:17760, mobile:1442, car:1057, fuel:9860, total:65919 },
+      jun: { salary:35800, insurance:17760, mobile:1325, car:990,  fuel:4500, total:60375 },
+      jul: { salary:35800, insurance:17760, mobile:1325, car:1160, fuel:7000, total:63045 },
+      aug: { salary:35800, insurance:17760, mobile:1325, car:450,  fuel:4500, total:59835 },
+    }},
+    { name: 'NATALIJA', role: 'Мерчендајзер', m: {
+      apr: { salary:35000, insurance:3740, mobile:1459, car:1050, fuel:3000,  total:44249 },
+      maj: { salary:35000, insurance:3740, mobile:1459, car:1790, fuel:8080,  total:50069 },
+      jun: { salary:41000, insurance:3740, mobile:1982, car:2100, fuel:11009, total:59831 },
+      jul: { salary:41000, insurance:3740, mobile:1982, car:610,  fuel:4402,  total:51734 },
+      aug: { salary:40000, insurance:3740, mobile:1982, car:1500, fuel:2525,  total:49747 },
+    }},
+  ],
+  monthlyCategoryTotals: {
+    apr: { fixed: 347800+160272, mobile: 13434, car: 14280, fuel: 35417, total: 571203 },
+    maj: { fixed: 347800+160272, mobile: 13434, car: 15807, fuel: 44498, total: 581811 },
+    jun: { fixed: 353800+160272, mobile: 14654, car: 10550, fuel: 44616, total: 583892 },
+    jul: { fixed: 355800+160272, mobile: 14654, car: 30104, fuel: 54912, total: 615742 },
+    aug: { fixed: 352800+160272, mobile: 14654, car: 8390,  fuel: 39958, total: 576074 },
+  }
+};
+
+function fmt(n) { return Math.round(n).toLocaleString('mk-MK'); }
+function titleCase(s) { return s.charAt(0) + s.slice(1).toLowerCase(); }
+function cssVar(name, fallback) {
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
+}
+
+// --- Stat tiles ---
+(function() {
+  const el = document.getElementById('stats');
+  const aug = DATA.monthlyCategoryTotals.aug;
+  const jul = DATA.monthlyCategoryTotals.jul;
+  const diff = aug.total - jul.total;
+  const pct = ((diff / jul.total) * 100).toFixed(1);
+  const avgAll = MONTHS.reduce((s,m) => s + DATA.monthlyCategoryTotals[m.key].total, 0) / MONTHS.length;
+
+  el.innerHTML = `
+    <div class="stat-tile">
+      <div class="label">Вкупно · Август</div>
+      <div class="value mono">${fmt(aug.total)}</div>
+      <div class="delta ${diff <= 0 ? 'down' : 'up'}">${diff <= 0 ? '' : '+'}${pct}% од Јули (${fmt(jul.total)})</div>
+    </div>
+    <div class="stat-tile">
+      <div class="label">Гориво · Август</div>
+      <div class="value mono">${fmt(aug.fuel)}</div>
+      <div class="delta">${((aug.fuel/aug.total)*100).toFixed(0)}% од вкупното</div>
+    </div>
+    <div class="stat-tile">
+      <div class="label">Возило / патарини · Август</div>
+      <div class="value mono">${fmt(aug.car)}</div>
+      <div class="delta">${((aug.car/aug.total)*100).toFixed(0)}% од вкупното</div>
+    </div>
+    <div class="stat-tile">
+      <div class="label">Просек Апр–Авг</div>
+      <div class="value mono">${fmt(avgAll)}</div>
+      <div class="delta">месечно вкупно</div>
+    </div>
+  `;
+})();
+
+// --- Monthly stacked chart ---
+(function() {
+  const svg = document.getElementById('monthlyChart');
+  const legend = document.getElementById('monthlyLegend');
+  const fixed = cssVar('--cat-fixed', '#34415a');
+  const mobile = cssVar('--cat-mobile', '#4a8a82');
+  const car = cssVar('--cat-car', '#5b7a9e');
+  const fuel = cssVar('--cat-fuel', '#c98a2e');
+  const textSec = cssVar('--text-secondary', '#5c584e');
+  const cats = [
+    { key: 'fixed', label: 'Плата + придонеси', color: fixed },
+    { key: 'mobile', label: 'Мобилен', color: mobile },
+    { key: 'car', label: 'Возило / патарини', color: car },
+    { key: 'fuel', label: 'Гориво', color: fuel },
+  ];
+  legend.innerHTML = cats.map(c => `<div class="legend-item"><span class="legend-swatch" style="background:${c.color}"></span>${c.label}</div>`).join('');
+
+  const w = 940, h = 300;
+  const ml = 66, mr = 16, mt = 16, mb = 34;
+  const cw = w - ml - mr, ch = h - mt - mb;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+  const maxVal = Math.max(...MONTHS.map(m => DATA.monthlyCategoryTotals[m.key].total));
+  const scaleMax = Math.ceil(maxVal / 100000) * 100000 + 50000;
+  const ticks = [];
+  for (let t = 0; t <= scaleMax; t += 100000) ticks.push(t);
+
+  let out = '';
+  ticks.forEach(t => {
+    const y = mt + ch - (t / scaleMax) * ch;
+    out += `<line class="grid" x1="${ml}" y1="${y}" x2="${ml + cw}" y2="${y}"/>`;
+    out += `<text class="axis-label" x="${ml - 10}" y="${y + 4}" text-anchor="end">${t === 0 ? '0' : (t/1000)+'к'}</text>`;
+  });
+
+  const barW = 96;
+  const gap = (cw - MONTHS.length * barW) / (MONTHS.length + 1);
+
+  MONTHS.forEach((mo, i) => {
+    const x = ml + gap + i * (barW + gap);
+    const d = DATA.monthlyCategoryTotals[mo.key];
+    let yCursor = mt + ch;
+    cats.forEach(c => {
+      const val = d[c.key];
+      const segH = (val / scaleMax) * ch;
+      const y = yCursor - segH;
+      out += `<rect x="${x}" y="${y}" width="${barW}" height="${Math.max(segH,0)}" fill="${c.color}"
+        data-month="${mo.full}" data-cat="${c.label}" data-value="${val}" class="bar-hover"/>`;
+      yCursor = y;
+    });
+    out += `<text x="${x + barW/2}" y="${yCursor - 8}" text-anchor="middle" fill="${textSec}" style="font-weight:600;font-size:12.5px;font-family:'JetBrains Mono',monospace">${fmt(d.total)}</text>`;
+    out += `<text x="${x + barW/2}" y="${mt + ch + 24}" text-anchor="middle" fill="${textSec}" style="font-weight:500;font-size:13px">${mo.full}</text>`;
+  });
+
+  svg.innerHTML = out;
+})();
+
+// --- Detail table (August) ---
+(function() {
+  const table = document.getElementById('detailTable');
+  const emps = DATA.employees;
+  let html = `<thead><tr>
+    <th>Вработен</th><th class="num">Плата</th><th class="num">Осигурување</th>
+    <th class="num">Мобилен</th><th class="num">Возило</th><th class="num">Гориво</th>
+    <th class="num">Вкупно</th>
+  </tr></thead><tbody>`;
+
+  let tot = { salary:0, insurance:0, mobile:0, car:0, fuel:0, total:0 };
+  emps.forEach(e => {
+    const a = e.m.aug;
+    Object.keys(tot).forEach(k => tot[k] += a[k]);
+    html += `<tr>
+      <td class="name">${titleCase(e.name)}<span class="role">${e.role}</span></td>
+      <td class="num">${fmt(a.salary)}</td>
+      <td class="num">${fmt(a.insurance)}</td>
+      <td class="num">${fmt(a.mobile)}</td>
+      <td class="num">${fmt(a.car)}</td>
+      <td class="num">${fmt(a.fuel)}</td>
+      <td class="num" style="font-weight:700">${fmt(a.total)}</td>
+    </tr>`;
+  });
+  html += `<tr class="total-row">
+    <td class="name">Вкупно (7 вработени)</td>
+    <td class="num">${fmt(tot.salary)}</td>
+    <td class="num">${fmt(tot.insurance)}</td>
+    <td class="num">${fmt(tot.mobile)}</td>
+    <td class="num">${fmt(tot.car)}</td>
+    <td class="num">${fmt(tot.fuel)}</td>
+    <td class="num">${fmt(tot.total)}</td>
+  </tr>`;
+  html += '</tbody>';
+  table.innerHTML = html;
+})();
+
+// --- Sparkline helper ---
+function sparkline(values, color) {
+  const w = 88, h = 26, pad = 3;
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = (max - min) || 1;
+  const step = (w - pad * 2) / (values.length - 1);
+  const pts = values.map((v, i) => {
+    const x = pad + i * step;
+    const y = pad + (1 - (v - min) / range) * (h - pad * 2);
+    return [x, y];
+  });
+  const path = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  const last = pts[pts.length - 1];
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <path d="${path}" fill="none" stroke="${color}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${last[0]}" cy="${last[1]}" r="2.6" fill="${color}"/>
+  </svg>`;
+}
+
+// --- Trend table ---
+(function() {
+  const table = document.getElementById('trendTable');
+  const emps = DATA.employees;
+  const accent = cssVar('--accent', '#1c7a5e');
+  let html = `<thead><tr>
+    <th>Вработен</th>
+    ${MONTHS.map(m => `<th class="num">${m.label}</th>`).join('')}
+    <th>Тренд</th>
+    <th class="num">Јул → Авг</th>
+  </tr></thead><tbody>`;
+
+  const totalsByMonth = {};
+  MONTHS.forEach(m => totalsByMonth[m.key] = 0);
+
+  emps.forEach(e => {
+    const vals = MONTHS.map(m => e.m[m.key].total);
+    MONTHS.forEach(m => totalsByMonth[m.key] += e.m[m.key].total);
+    const diff = e.m.aug.total - e.m.jul.total;
+    const cls = diff > 0 ? 'neg' : diff < 0 ? 'pos' : 'flat';
+    const sign = diff > 0 ? '+' : '';
+    html += `<tr>
+      <td class="name">${titleCase(e.name)}<span class="role">${e.role}</span></td>
+      ${vals.map(v => `<td class="num">${fmt(v)}</td>`).join('')}
+      <td class="spark-cell">${sparkline(vals, accent)}</td>
+      <td class="num"><span class="badge ${cls}">${sign}${fmt(diff)}</span></td>
+    </tr>`;
+  });
+
+  const totVals = MONTHS.map(m => totalsByMonth[m.key]);
+  const totDiff = totalsByMonth.aug - totalsByMonth.jul;
+  const totCls = totDiff > 0 ? 'neg' : totDiff < 0 ? 'pos' : 'flat';
+  const totSign = totDiff > 0 ? '+' : '';
+  html += `<tr class="total-row">
+    <td class="name">Вкупно</td>
+    ${totVals.map(v => `<td class="num">${fmt(v)}</td>`).join('')}
+    <td class="spark-cell">${sparkline(totVals, accent)}</td>
+    <td class="num"><span class="badge ${totCls}">${totSign}${fmt(totDiff)}</span></td>
+  </tr>`;
+  html += '</tbody>';
+  table.innerHTML = html;
+})();
+
+// --- Tooltip ---
+document.querySelectorAll('.bar-hover').forEach(bar => {
+  const tip = document.getElementById('tooltip');
+  bar.addEventListener('mouseenter', () => {
+    const month = bar.dataset.month || '';
+    const cat = bar.dataset.cat || '';
+    const val = parseInt(bar.dataset.value, 10);
+    tip.innerHTML = `<div class="tt-label">${month} · ${cat}</div><div class="tt-value">${fmt(val)} МКД</div>`;
+    tip.hidden = false;
+  });
+  bar.addEventListener('mousemove', e => {
+    tip.style.left = (e.pageX + 12) + 'px';
+    tip.style.top = (e.pageY - 40) + 'px';
+  });
+  bar.addEventListener('mouseleave', () => { tip.hidden = true; });
+});
+</script>
