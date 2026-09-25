@@ -160,6 +160,10 @@ th.r{text-align:right}
 .dsw:hover{background:var(--s3)}
 .dist-badge{font-size:10px;padding:2px 7px;border-radius:4px;margin-left:5px}
 
+
+.lang-switcher { display:flex; gap:4px; align-items:center; margin-left:8px; }
+.lang-btn { padding:2px 8px; border:1px solid #555; border-radius:4px; cursor:pointer; font-size:11px; background:#333; color:#ccc; }
+.lang-btn.lang-active { background:#fff; color:#000; font-weight:600; border-color:#fff; }
 </style>
 </head>
 <body>
@@ -171,9 +175,9 @@ th.r{text-align:right}
     <div class="login-sub">ETI Продажби · Најава</div>
     <div class="login-err" id="loginErr">Погрешно корисничко ime или лозинка</div>
     <label class="login-label">Корисничко ime</label>
-    <input class="login-input" id="loginUser" type="text" placeholder="Внеси корисничко ime" autocomplete="username">
+    <input class="login-input" id="loginUser" type="text" placeholder="Внеси корисничко ime" data-i18n-placeholder="login_user" autocomplete="username">
     <label class="login-label">Лозинка</label>
-    <input class="login-input" id="loginPass" type="password" placeholder="Внеси лозинка" autocomplete="current-password">
+    <input class="login-input" id="loginPass" type="password" placeholder="Внеси лозинка" data-i18n-placeholder="login_pass" autocomplete="current-password">
     <button class="login-btn" onclick="doLogin()">Најави се</button>
   </div>
 </div>
@@ -214,9 +218,9 @@ th.r{text-align:right}
   </div>
 
   <div class="vswitch">
-  <div class="vsw active" data-v="grp" onclick="switchView('grp')">По групи<span class="bsm">8 групи</span></div>
-  <div class="vsw" data-v="top" onclick="switchView('top')">Топ ставки — споено<span class="bsm">84 ставки</span></div>
-  <div class="vsw" data-v="mth" onclick="switchView('mth')">По месеци<span class="bsm">Јан–Авг</span></div>
+  <div class="vsw active" data-v="grp" onclick="switchView('grp')" data-i18n="tab_groups">По групи<span class="bsm">8 групи</span></div>
+  <div class="vsw" data-v="top" onclick="switchView('top')" data-i18n="tab_top">Топ ставки — споено<span class="bsm">84 ставки</span></div>
+  <div class="vsw" data-v="mth" onclick="switchView('mth')" data-i18n="tab_monthly">По месеци<span class="bsm">Јан–Авг</span></div>
 </div>
 
 <!-- ══ GRP VIEW ══ -->
@@ -233,10 +237,10 @@ th.r{text-align:right}
   </div>
 </div>
 <div class="tabs" id="metricTabs">
-  <div class="tab active" onclick="setMetric('eur')">EUR</div>
-  <div class="tab" onclick="setMetric('den')">Денари</div>
-  <div class="tab" onclick="setMetric('ton')">Тони</div>
-  <div class="tab" onclick="setMetric('qty')">Количина</div>
+  <div class="tab active" onclick="setMetric('eur')" data-metric-i18n="eur">EUR</div>
+  <div class="tab" onclick="setMetric('den')" data-metric-i18n="den">Денари</div>
+  <div class="tab" onclick="setMetric('ton')" data-metric-i18n="ton">Тони</div>
+  <div class="tab" onclick="setMetric('qty')" data-metric-i18n="qty">Количина</div>
   <div class="tab" onclick="setMetric('pct')">%</div>
 </div>
 <div class="cards" id="cards"></div>
@@ -244,7 +248,7 @@ th.r{text-align:right}
 <div class="tbar">
   <div class="tbar-l" style="display:flex;gap:6px">
     <button class="btn" onclick="expandAll()">Прикажи сите</button>
-    <button class="btn" onclick="collapseAll()">Сокри сите</button>
+    <button class="btn" onclick="collapseAll()" data-i18n="hide_all">Сокри сите</button>
   </div>
   <span style="font-size:12px;color:var(--tx2)" id="tinfo"></span>
 </div>
@@ -263,7 +267,7 @@ th.r{text-align:right}
   Извор: SALE BY GROUP (FIN %) · 01.01–31.07 · подредено по 2026 · продажби во Денари
 </div>
 <div class="top-filter">
-  <button class="tf on" data-f="all" onclick="setTopFilter('all')">Сите</button>
+  <button class="tf on" data-f="all" onclick="setTopFilter('all')" data-i18n="all">Сите</button>
   <button class="tf" data-f="merged" onclick="setTopFilter('merged')">🔗 Споени</button>
   <button class="tf" data-f="new" onclick="setTopFilter('new')">✨ Нови 2026</button>
   <button class="tf" data-f="disc" onclick="setTopFilter('disc')">❌ Повлечени</button>
@@ -770,6 +774,57 @@ function loadXLSX(){if(window.XLSX)return Promise.resolve();return new Promise(f
 
 
 // ── AUTH ─────────────────────────────────────────────────────────────────────
+
+const TR = {
+  mk: {
+    tab_groups: 'По групи',
+    tab_top: 'Топ ставки — споено',
+    tab_monthly: 'По месеци',
+    qty: t('qty'), den: t('den'), eur: t('eur'), ton: t('ton'), share: t('share'),
+    all: 'Сите', merged: 'Споени', single: 'Единечни', new_: 'Нови', disc: 'Откажани',
+    hide_all: 'Сокри сите', show_all: 'Прикажи сите',
+    group: t('group'), article: t('article'),
+    login_user: 'Корисничко ime', login_pass: 'Лозинка', login_btn: 'Најави се',
+    logout: 'Одјави се', title_sub: 'ETI Продажби · Најава',
+    dist_badge: 'ДИСТ', period_label: 'Период:',
+    jan:'Јан',feb:'Феб',mar:'Мар',apr:'Апр',maj:'Мај',jun:'Јун',jul:'Јул',avg:'Авг',
+    delta:'Промена', vs:'vs',
+  },
+  en: {
+    tab_groups: 'By groups',
+    tab_top: 'Top items — merged',
+    tab_monthly: 'By month',
+    qty: 'Quantity', den: 'Denars', eur: 'Euros', ton: 'Tons', share: '% share',
+    all: 'All', merged: 'Merged', single: 'Individual', new_: 'New', disc: 'Discontinued',
+    hide_all: 'Collapse all', show_all: 'Expand all',
+    group: 'Group', article: 'Article',
+    login_user: 'Username', login_pass: 'Password', login_btn: 'Sign in',
+    logout: 'Sign out', title_sub: 'ETI Sales · Login',
+    dist_badge: 'DIST', period_label: 'Period:',
+    jan:'Jan',feb:'Feb',mar:'Mar',apr:'Apr',maj:'May',jun:'Jun',jul:'Jul',avg:'Aug',
+    delta:'Change', vs:'vs',
+  }
+};
+var currentLang = 'mk';
+function t(key){ return TR[currentLang][key] || key; }
+function setLang(lang){
+  currentLang = lang;
+  document.getElementById('btn-lang-mk').classList.toggle('lang-active', lang==='mk');
+  document.getElementById('btn-lang-en').classList.toggle('lang-active', lang==='en');
+  applyLang();
+}
+function applyLang(){
+  // Tabs
+  var tabs = document.querySelectorAll('[data-i18n]');
+  tabs.forEach(function(el){ el.textContent = t(el.getAttribute('data-i18n')); });
+  // Metric toggle buttons
+  var mbtns = document.querySelectorAll('[data-metric-i18n]');
+  mbtns.forEach(function(el){ el.textContent = t(el.getAttribute('data-metric-i18n')); });
+  // Re-render current view to update table headers
+  if(typeof renderGrp==='function') renderGrp();
+  if(typeof renderTop==='function') renderTop();
+  if(typeof renderMth==='function') renderMth();
+}
 const USERS = {
   'ersin':      {pass:'2504', role:'admin',   label:'Ersin'},
   'andrijana':  {pass:'1234', role:'manager', label:'Andrijana'},
