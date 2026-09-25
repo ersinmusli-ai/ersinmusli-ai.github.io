@@ -247,7 +247,7 @@ th.r{text-align:right}
 <div class="srchw" id="sw"><input class="srch" id="si" type="text" placeholder="Пребарај артикл или група..." oninput="doSearch(this.value)"></div>
 <div class="tbar">
   <div class="tbar-l" style="display:flex;gap:6px">
-    <button class="btn" onclick="expandAll()">Прикажи сите</button>
+    <button class="btn" onclick="expandAll()" data-i18n="show_all">Прикажи сите</button>
     <button class="btn" onclick="collapseAll()" data-i18n="hide_all">Сокри сите</button>
   </div>
   <span style="font-size:12px;color:var(--tx2)" id="tinfo"></span>
@@ -278,12 +278,12 @@ th.r{text-align:right}
   <table>
     <thead>
       <tr style="border-bottom:1px solid var(--bd);background:var(--s2)">
-        <th style="width:38%">Ранг · Артикл · Група</th>
+        <th data-i18n="rank_art_grp" style="width:38%">Ранг · Артикл · Група</th>
         <th class="r" style="width:13%">Ден 2025</th>
         <th class="r" style="width:13%">Ден 2026</th>
-        <th class="r" style="width:8%">Раст %</th>
-        <th class="r" style="width:12%">Δ Денари</th>
-        <th class="r" style="width:16%">% удел 2026</th>
+        <th class="r" data-i18n="grow_pct" style="width:8%">Раст %</th>
+        <th class="r" data-i18n="delta_den" style="width:12%">Δ Денари</th>
+        <th class="r" data-i18n="share_yr_2026" style="width:16%">% удел 2026</th>
       </tr>
     </thead>
     <tbody id="topTbody"></tbody>
@@ -300,8 +300,8 @@ th.r{text-align:right}
   <div class="mth-tab active" data-m="eur26" onclick="setMthM('eur26')">EUR 2026</div>
   <div class="mth-tab" data-m="eur25" onclick="setMthM('eur25')">EUR 2025</div>
   <div class="mth-tab" data-m="den26" onclick="setMthM('den26')">Ден 2026</div>
-  <div class="mth-tab" data-m="ton26" onclick="setMthM('ton26')">Тони 2026</div>
-  <div class="mth-tab" data-m="qty26" onclick="setMthM('qty26')">Кол. 2026</div>
+  <div class="mth-tab" data-m="ton26" onclick="setMthM('ton26')" data-i18n="ton_2026">Тони 2026</div>
+  <div class="mth-tab" data-m="qty26" onclick="setMthM('qty26')" data-i18n="qty_2026">Кол. 2026</div>
 </div>
 <div class="legend"><div class="leg-item"><span class="leg-dot" style="background:#2563eb"></span>SALTY</div><div class="leg-item"><span class="leg-dot" style="background:#16a34a"></span>PETIT BEURRE</div><div class="leg-item"><span class="leg-dot" style="background:#0891b2"></span>FILED BISCUITS</div><div class="leg-item"><span class="leg-dot" style="background:#7c3aed"></span>KEK</div><div class="leg-item"><span class="leg-dot" style="background:#db2777"></span>DARE</div><div class="leg-item"><span class="leg-dot" style="background:#d97706"></span>BROWNI</div><div class="leg-item"><span class="leg-dot" style="background:#dc2626"></span>CICI BEBE</div><div class="leg-item"><span class="leg-dot" style="background:#65a30d"></span>ETIMEK</div></div>
 <div class="chart-wrap"><div class="chart-periods" id="mthBars"></div></div>
@@ -309,9 +309,9 @@ th.r{text-align:right}
   <table>
     <thead>
       <tr>
-        <th style="text-align:left;width:17%">Група</th>
+        <th data-i18n="group" style="text-align:left;width:17%">Група</th>
         <th>Јан</th><th>Феб</th><th>Мар</th><th>Апр</th><th>Мај</th><th>Јун</th><th>Јул</th>
-        <th>ВКУПНО</th>
+        <th data-i18n="total">ВКУПНО</th>
       </tr>
     </thead>
     <tbody id="mthTbody"></tbody>
@@ -407,24 +407,24 @@ function renderGrp(){
   var disp25=tot25, disp26=tot26;
   if(metric==='pct'){ disp25=100; disp26=100; }
   document.getElementById('cards').innerHTML=
-    '<div class="card"><div class="cl">'+M.lbl+'</div><div class="cv">'+(metric==='pct'?'100.0%':M.fmt(tot25))+'</div></div>'+
-    '<div class="card"><div class="cl">'+M.lbl2+'</div><div class="cv">'+(metric==='pct'?'100.0%':M.fmt(tot26))+'</div></div>'+
-    '<div class="card"><div class="cl">Раст</div><div class="cv '+(pct>=0?'pos':'neg')+'">'+(pct>=0?'+':'')+pct.toFixed(1)+'%</div></div>'+
-    '<div class="card"><div class="cl">Тони 25/26</div><div class="cv">'+tt25.toFixed(1)+'/'+tt26.toFixed(1)+'</div></div>'+
-    '<div class="card"><div class="cl">Кол. 2025</div><div class="cv">'+Math.round(tq25).toLocaleString('de-DE')+'</div></div>'+
-    '<div class="card"><div class="cl">Кол. 2026</div><div class="cv">'+Math.round(tq26).toLocaleString('de-DE')+'</div></div>';
+    '<div class="card"><div class="cl">'+mLabel(metric,2025)+'</div><div class="cv">'+(metric==='pct'?'100.0%':M.fmt(tot25))+'</div></div>'+
+    '<div class="card"><div class="cl">'+mLabel(metric,2026)+'</div><div class="cv">'+(metric==='pct'?'100.0%':M.fmt(tot26))+'</div></div>'+
+    '<div class="card"><div class="cl">'+t('grow')+'</div><div class="cv '+(pct>=0?'pos':'neg')+'">'+(pct>=0?'+':'')+pct.toFixed(1)+'%</div></div>'+
+    '<div class="card"><div class="cl">'+t('ton')+' 25/26</div><div class="cv">'+tt25.toFixed(1)+'/'+tt26.toFixed(1)+'</div></div>'+
+    '<div class="card"><div class="cl">'+mLabel('qty',2025)+'</div><div class="cv">'+Math.round(tq25).toLocaleString('de-DE')+'</div></div>'+
+    '<div class="card"><div class="cl">'+mLabel('qty',2026)+'</div><div class="cv">'+Math.round(tq26).toLocaleString('de-DE')+'</div></div>';
 
   document.getElementById('gthead').innerHTML=
-    '<th style="width:36%">Група / Артикл</th>'+
-    '<th class="r" style="width:12%">'+M.lbl+'</th>'+
-    '<th class="r" style="width:12%">'+M.lbl2+'</th>'+
-    '<th class="r" style="width:8%">Раст %</th>'+
-    '<th class="r hsm" style="width:10%">Тони 2025</th>'+
-    '<th class="r hsm" style="width:10%">Тони 2026</th>'+
-    '<th class="r" style="width:12%">% удел 2026</th>';
+    '<th style="width:36%">'+t('grp_art')+'</th>'+
+    '<th class="r" style="width:12%">'+mLabel(metric,2025)+'</th>'+
+    '<th class="r" style="width:12%">'+mLabel(metric,2026)+'</th>'+
+    '<th class="r" style="width:8%">'+t('grow_pct')+'</th>'+
+    '<th class="r hsm" style="width:10%">'+t('ton')+' 2025</th>'+
+    '<th class="r hsm" style="width:10%">'+t('ton')+' 2026</th>'+
+    '<th class="r" style="width:12%">'+t('share_yr')+' 2026</th>';
 
   var totItems=DATA.reduce(function(s,g){return s+g.items.filter(function(x){return x.eur25>0||x.eur26>0;}).length;},0);
-  document.getElementById('tinfo').textContent=DATA.length+' групи · '+totItems+' артикли';
+  document.getElementById('tinfo').textContent=DATA.length+' '+t('groups_n')+' · '+totItems+' '+t('items_n');
 
   var tbody=document.getElementById('gtbody');
   tbody.innerHTML='';
@@ -495,13 +495,13 @@ function renderGrp(){
       dtr.dataset.detid=iid; dtr.dataset.group=gi;
       dtr.innerHTML='<td colspan="7"><div class="dg">'+
         '<div><div class="dk">EUR 2025/2026</div><div class="dv">'+(item.eur25>0?fmtE(item.eur25):'—')+' → '+(item.eur26>0?fmtE(item.eur26):'—')+' <span class="badge '+ge25.c+'">'+ge25.s+'</span></div></div>'+
-        '<div><div class="dk">Денари 2025/2026</div><div class="dv">'+(item.den25>0?fmtD(item.den25):'—')+' → '+(item.den26>0?fmtD(item.den26):'—')+' <span class="badge '+gd25.c+'">'+gd25.s+'</span></div></div>'+
-        '<div><div class="dk">Тони 2025/2026</div><div class="dv">'+fmtT(item.ton25)+' → '+fmtT(item.ton26)+' <span class="badge '+gt25.c+'">'+gt25.s+'</span></div></div>'+
-        '<div><div class="dk">Количина 2025/2026</div><div class="dv">'+fmtN(item.qty25)+' → '+fmtN(item.qty26)+' <span class="badge '+gq25.c+'">'+gq25.s+'</span></div></div>'+
-        '<div><div class="dk">% удел 2025/2026</div><div class="dv">'+item.pct25.toFixed(3)+'% → '+item.pct26.toFixed(3)+'%</div></div>'+
-        '<div><div class="dk">Пакување</div><div class="dv">'+item.box+' парч/кутија · '+item.gr+' g/парче</div></div>'+
-        '<div><div class="dk">Тежина/кутија</div><div class="dv">'+((item.box*item.gr)/1000).toFixed(3)+' kg</div></div>'+
-        '<div><div class="dk">ETI код</div><div class="dv">'+item.eti+'</div></div>'+
+        '<div><div class="dk">'+t('den_both')+'</div><div class="dv">'+(item.den25>0?fmtD(item.den25):'—')+' → '+(item.den26>0?fmtD(item.den26):'—')+' <span class="badge '+gd25.c+'">'+gd25.s+'</span></div></div>'+
+        '<div><div class="dk">'+t('ton_both')+'</div><div class="dv">'+fmtT(item.ton25)+' → '+fmtT(item.ton26)+' <span class="badge '+gt25.c+'">'+gt25.s+'</span></div></div>'+
+        '<div><div class="dk">'+t('qty_both')+'</div><div class="dv">'+fmtN(item.qty25)+' → '+fmtN(item.qty26)+' <span class="badge '+gq25.c+'">'+gq25.s+'</span></div></div>'+
+        '<div><div class="dk">'+t('share_both')+'</div><div class="dv">'+item.pct25.toFixed(3)+'% → '+item.pct26.toFixed(3)+'%</div></div>'+
+        '<div><div class="dk">'+t('packaging')+'</div><div class="dv">'+item.box+' '+t('pcs_box')+' · '+item.gr+' '+t('g_piece')+'</div></div>'+
+        '<div><div class="dk">'+t('weight_box')+'</div><div class="dv">'+((item.box*item.gr)/1000).toFixed(3)+' kg</div></div>'+
+        '<div><div class="dk">'+t('eti_code')+'</div><div class="dv">'+item.eti+'</div></div>'+
       '</div></td>';
       tbody.appendChild(dtr);
     });
@@ -789,6 +789,15 @@ const TR = {
     dist_badge: 'ДИСТ', period_label: 'Период:',
     jan:'Јан',feb:'Феб',mar:'Мар',apr:'Апр',maj:'Мај',jun:'Јун',jul:'Јул',avg:'Авг',
     delta:'Промена', vs:'vs',
+    grow:'Раст', grow_pct:'Раст %', grp_art:'Група / Артикл',
+    rank_art_grp:'Ранг · Артикл · Група', share_yr:'% удел',
+    delta_den:'Δ Денари', groups_n:'групи', items_n:'артикли',
+    ton_both:'Тони 2025/2026', share_both:'% удел 2025/2026',
+    total:'ВКУПНО', ton_2026:'Тони 2026', qty_2026:'Кол. 2026',
+    share_yr_2026:'% удел 2026',
+    den_both:'Денари 2025/2026', qty_both:'Количина 2025/2026',
+    packaging:'Пакување', weight_box:'Тежина/кутија', eti_code:'ETI код',
+    pcs_box:'парч/кутија', g_piece:'g/парче',
   },
   en: {
     tab_groups: 'By groups',
@@ -803,10 +812,20 @@ const TR = {
     dist_badge: 'DIST', period_label: 'Period:',
     jan:'Jan',feb:'Feb',mar:'Mar',apr:'Apr',maj:'May',jun:'Jun',jul:'Jul',avg:'Aug',
     delta:'Change', vs:'vs',
+    grow:'Growth', grow_pct:'Growth %', grp_art:'Group / Article',
+    rank_art_grp:'Rank · Article · Group', share_yr:'% share',
+    delta_den:'Δ Denars', groups_n:'groups', items_n:'items',
+    ton_both:'Tons 2025/2026', share_both:'% share 2025/2026',
+    total:'TOTAL', ton_2026:'Tons 2026', qty_2026:'Qty 2026',
+    share_yr_2026:'% share 2026',
+    den_both:'Denars 2025/2026', qty_both:'Quantity 2025/2026',
+    packaging:'Packaging', weight_box:'Weight/box', eti_code:'ETI code',
+    pcs_box:'pcs/box', g_piece:'g/piece',
   }
 };
 var currentLang = 'mk';
 function t(key){ return TR[currentLang][key] || key; }
+function mLabel(m,yr){ var n={eur:'EUR',den:t('den'),ton:t('ton'),qty:t('qty'),pct:'%'}; return (n[m]||m)+' '+yr; }
 function setLang(lang){
   currentLang = lang;
   document.getElementById('btn-lang-mk').classList.toggle('lang-active', lang==='mk');
@@ -814,12 +833,21 @@ function setLang(lang){
   applyLang();
 }
 function applyLang(){
-  // Tabs
-  var tabs = document.querySelectorAll('[data-i18n]');
-  tabs.forEach(function(el){ el.textContent = t(el.getAttribute('data-i18n')); });
-  // Metric toggle buttons
-  var mbtns = document.querySelectorAll('[data-metric-i18n]');
-  mbtns.forEach(function(el){ el.textContent = t(el.getAttribute('data-metric-i18n')); });
+  // Translate data-i18n elements — update only the first text node so
+  // child elements (e.g. badge <span class="bsm"> inside tabs) are preserved
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var val = t(el.getAttribute('data-i18n'));
+    var firstTextNode = null;
+    el.childNodes.forEach(function(node){
+      if(node.nodeType === 3 && !firstTextNode) firstTextNode = node;
+    });
+    if(firstTextNode) firstTextNode.textContent = val;
+    else el.textContent = val;
+  });
+  // Metric toggle buttons (no child elements, safe to use textContent)
+  document.querySelectorAll('[data-metric-i18n]').forEach(function(el){
+    el.textContent = t(el.getAttribute('data-metric-i18n'));
+  });
   // Re-render current view to update table headers
   if(typeof renderGrp==='function') renderGrp();
   if(typeof renderTop==='function') renderTop();
@@ -886,6 +914,8 @@ document.addEventListener('DOMContentLoaded', function(){
     rb.className = 'role-badge'+(sr==='admin'?' admin':'');
     if(sr==='admin') document.getElementById('uploadBtn').style.display='';
   }
+  // Initialize MK as active language (highlights МК button, applies translations)
+  setLang('mk');
 });
 
 
