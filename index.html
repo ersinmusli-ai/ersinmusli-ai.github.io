@@ -164,6 +164,13 @@ th.r{text-align:right}
 .lang-switcher { display:flex; gap:4px; align-items:center; margin-left:8px; }
 .lang-btn { padding:2px 8px; border:1px solid #555; border-radius:4px; cursor:pointer; font-size:11px; background:#333; color:#ccc; }
 .lang-btn.lang-active { background:#fff; color:#000; font-weight:600; border-color:#fff; }
+
+.page-nav{display:flex;gap:4px;margin-left:14px}
+.pnav{background:var(--s2);border:1px solid var(--bd);color:var(--tx2);padding:5px 12px;border-radius:var(--r);cursor:pointer;font-size:12px;font-weight:600;transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.pnav.active{background:var(--tx);color:#fff;border-color:var(--tx)}
+.mkt-sec-title{font-size:13px;font-weight:700;color:var(--tx);margin:4px 0 8px;padding-left:2px}
+.mkt-dsw{cursor:pointer}
+.mtwrap td.lft,.mtwrap th.lft{text-align:left}
 </style>
 </head>
 <body>
@@ -186,7 +193,11 @@ th.r{text-align:right}
 <div class="toast" id="toast"></div>
 <header class="hdr">
   <div class="logo">SF</div>
-  <span class="htitle">Senfood MK &nbsp;·&nbsp; ETI Продажби</span>
+  <span class="htitle">Senfood MK</span>
+  <div class="page-nav">
+    <button class="pnav active" id="pnav-sales" onclick="showPage('sales')">📊 <span data-i18n="nav_sales">Продажби</span></button>
+    <button class="pnav" id="pnav-mkt" onclick="showPage('marketing')">📣 <span data-i18n="nav_mkt">Маркетинг</span></button>
+  </div>
   <select id="periodSel" onchange="changePeriod(this.value)" style="font-size:12px;color:var(--tx2);background:var(--s2);border:1px solid var(--bd);padding:4px 10px;border-radius:var(--r);cursor:pointer;outline:none;max-width:200px">
   <option value="jan">Јануари</option>
   <option value="feb">Февруари</option>
@@ -214,6 +225,7 @@ th.r{text-align:right}
 </header>
 
 <div class="main">
+<div id="salesPage">
 <div class="dist-tabs" id="distTabs">
     <div class="dsw" id="d-eti" onclick="changeDist('eti')" style="background:#181816;color:#fff">ETI<span class="dist-badge" style="background:#333;color:#ccc">TOTAL</span></div>
     <div class="dsw" id="d-aldaco" onclick="changeDist('aldaco')">ALDACO<span class="dist-badge" style="background:#e8f5e9;color:#1d9e75">ДИСТ</span></div>
@@ -321,6 +333,50 @@ th.r{text-align:right}
   </table>
 </div>
 </div><!-- /mthView -->
+</div><!-- /salesPage -->
+
+<!-- ══════════ MARKETING PAGE ══════════ -->
+<div id="marketingPage" style="display:none">
+  <div class="dist-tabs">
+    <div class="dsw mkt-dsw active" data-md="aldaco" onclick="setMktDist('aldaco')" style="background:#1d9e75;color:#fff">ALDACO<span class="dist-badge" style="background:#e8f5e9;color:#1d9e75">ДИСТ</span></div>
+    <div class="dsw mkt-dsw" data-md="imperijal" onclick="setMktDist('imperijal')">ИМПЕРИЈАЛ<span class="dist-badge" style="background:#fce8e8;color:#d85a30">ДИСТ</span></div>
+  </div>
+
+  <div class="mth-tabs" id="mkt2Quarters" style="max-width:220px;margin-bottom:14px">
+    <div class="mth-tab active" data-mq="Q1" onclick="setMkt2Q('Q1')">Q1 2026</div>
+    <div class="mth-tab" data-mq="Q2" onclick="setMkt2Q('Q2')">Q2 2026</div>
+  </div>
+
+  <div class="cards" id="mkt2Cards" style="grid-template-columns:repeat(5,1fr)"></div>
+
+  <div class="mkt-sec-title" data-i18n="mkt_clients_t">Маркетинг по комитент</div>
+  <div class="mtwrap" style="margin-bottom:18px">
+    <table>
+      <thead><tr>
+        <th data-i18n="mkt_c_name" style="text-align:left;width:26%">Комитент</th>
+        <th data-i18n="mkt_c_seg" style="text-align:left">Сегмент</th>
+        <th data-i18n="mkt_c_sales">Продажба €</th>
+        <th data-i18n="mkt_c_leaf">Летоци €</th>
+        <th data-i18n="mkt_c_pos">Позиции €</th>
+        <th data-i18n="mkt_c_mktg">Маркетинг €</th>
+        <th data-i18n="mkt_c_pct">%</th>
+      </tr></thead>
+      <tbody id="mkt2Tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="mkt-sec-title" data-i18n="mkt_extra_t">Екстра маркетинг — за што се потрошени средствата</div>
+  <div class="mtwrap">
+    <table>
+      <thead><tr>
+        <th data-i18n="mkt_e_desc" style="text-align:left;width:80%">Опис / намена</th>
+        <th data-i18n="mkt_e_eur">Износ €</th>
+      </tr></thead>
+      <tbody id="mkt2Extra"></tbody>
+    </table>
+  </div>
+</div>
+
 
 <div class="footer" id="footer">ETI SKU by Groups · 01.01–31.07 2025 vs 2026 · Извор: SALE BY GROUP (FIN %)</div>
 </div><!-- /main -->
@@ -783,6 +839,14 @@ const TR = {
     tab_groups: 'По групи',
     tab_top: 'Топ ставки — споено',
     tab_monthly: 'По месеци',
+    tab_mkt: 'Маркетинг',
+    mkt_note_t: 'Маркетинг трошоци по квартали', mkt_note_b: '— за Aldaco и Imperijal. ETI прикажува збир од двата дистрибутери. Износите се маркетинг издвоен како % од продажбата по сегмент.',
+    mkt_segment: 'Сегмент', mkt_sales_eur: 'Продажба €', mkt_spend_den: 'Маркетинг ДЕН', mkt_spend_eur: 'Маркетинг €', mkt_pct: '% од продажба', mkt_pct_of_sales: '% од продажба',
+    nav_sales: 'Продажби', nav_mkt: 'Маркетинг',
+    mkt_k_realized: 'Маркетинг (реализиран)', mkt_k_extra: 'Екстра маркетинг', mkt_k_total: 'Вкупно маркетинг', mkt_k_sales: 'Продажба', mkt_k_pct: '% од продажба', mkt_of_sales: 'од продажба',
+    mkt_clients_t: 'Маркетинг по комитент', mkt_extra_t: 'Екстра маркетинг — за што се потрошени средствата',
+    mkt_c_name: 'Комитент', mkt_c_seg: 'Сегмент', mkt_c_sales: 'Продажба €', mkt_c_leaf: 'Летоци €', mkt_c_pos: 'Позиции €', mkt_c_mktg: 'Маркетинг €', mkt_c_pct: '%',
+    mkt_e_desc: 'Опис / намена', mkt_e_eur: 'Износ €',
     qty: 'Количина', den: 'Денари', eur: 'Евра', ton: 'Тони', share: '% учество',
     all: 'Сите', merged: 'Споени', single: 'Единечни', new_: 'Нови', disc: 'Откажани',
     hide_all: 'Сокри сите', show_all: 'Прикажи сите',
@@ -806,6 +870,14 @@ const TR = {
     tab_groups: 'By groups',
     tab_top: 'Top items — merged',
     tab_monthly: 'By month',
+    tab_mkt: 'Marketing',
+    mkt_note_t: 'Marketing spend by quarter', mkt_note_b: '— for Aldaco and Imperijal. ETI shows the sum of both distributors. Amounts are marketing allocated as % of sales per segment.',
+    mkt_segment: 'Segment', mkt_sales_eur: 'Sales €', mkt_spend_den: 'Marketing DEN', mkt_spend_eur: 'Marketing €', mkt_pct: '% of sales', mkt_pct_of_sales: '% of sales',
+    nav_sales: 'Sales', nav_mkt: 'Marketing',
+    mkt_k_realized: 'Marketing (realized)', mkt_k_extra: 'Extra marketing', mkt_k_total: 'Total marketing', mkt_k_sales: 'Sales', mkt_k_pct: '% of sales', mkt_of_sales: 'of sales',
+    mkt_clients_t: 'Marketing by client', mkt_extra_t: 'Extra marketing — what the funds were used for',
+    mkt_c_name: 'Client', mkt_c_seg: 'Segment', mkt_c_sales: 'Sales €', mkt_c_leaf: 'Leaflets €', mkt_c_pos: 'Positions €', mkt_c_mktg: 'Marketing €', mkt_c_pct: '%',
+    mkt_e_desc: 'Description / purpose', mkt_e_eur: 'Amount €',
     qty: 'Quantity', den: 'Denars', eur: 'Euros', ton: 'Tons', share: '% share',
     all: 'All', merged: 'Merged', single: 'Individual', new_: 'New', disc: 'Discontinued',
     hide_all: 'Collapse all', show_all: 'Expand all',
@@ -1076,6 +1148,88 @@ function renderMthForDist(){
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 renderGrp();
+
+
+// ══════════ MARKETING PAGE LOGIC ══════════
+const MKT2 = {"aldaco":{"Q1":{"summary":{"extra":2494.23,"marketing":26618.65,"total":29112.88,"sales":635425.0},"extra_items":[{"desc":"VIVA EXTRA TP - vo Q-1 za celna ke se isplati 4.500den","eur":73.17},{"desc":"ROJAL MARKET TP - vo Q-1 za 3 polisi vo celna ke se isplati 3.000den","eur":48.78},{"desc":"KOLS MARKET DOOEL - vo Q-1 za Eti stalaza ke se isplati 3.750den","eur":60.98},{"desc":"HAKIMKA TP - vo Q-1 za Celna ke se islpati 4.500den","eur":73.17},{"desc":"CENTAR DELIKATES DVA - vo Q-1 za Dare stalaza ke se isplati 4.500den","eur":73.17},{"desc":"SKOR DOOEL - vo Q-1 za Eti stalaza ke se isplati 3.000den","eur":48.78},{"desc":"BLIRI TP - vo Q-1 za Dare stalaza ke se isplati + 3.000den","eur":48.78},{"desc":"ISTANBUL BEDIR HAN DOOEL - vo Q-1 za Stalaza Dare ke se isplati + 3.750den","eur":60.98},{"desc":"SEMAFOR KOMERC-R - vo Q-1 za Dare pozicia ke se isplati + 2.500den","eur":40.65},{"desc":"BALKOPROM DOOEL - vo Q-1 za Dare pozicia ke se isplati + 5.000den","eur":81.3},{"desc":"JIS KOMPANI DOO - vo Q-1 za Dare pozicia vo kasa ke se isplati + 7.250den","eur":117.89},{"desc":"GEGA DOOEL - vo Q-1 za Dare pozicia vo kasaite ke se isplati + 7.000den","eur":113.82},{"desc":"BABUS KOMPANI - vo Q-1 za Dare stalaza ke se isplati + 6.000den","eur":97.56},{"desc":"AMIR MARKET DOOEL - vo Q-1 za Dare pozicia ke se isplati + 5.000den","eur":81.3},{"desc":"BONITA PLUS DOOEL - vo Q-1 za Dare stalaza ke se iplati + 3.000den","eur":48.78},{"desc":"EKSTRA MARKET ALI TP - vo Q-1 za Dare pozicia ke se isplati + 5.000den","eur":81.3},{"desc":"GOLDI SV DOOEL - vo Q-1 za Dare pozicia ke se isplati + 2.500den","eur":40.65},{"desc":"Odobrenie za 30pak. Dare 241gr od Faktura 1-1/124253 za SenFood 79.020den","eur":1284.88},{"desc":"Odobrenie 500-32/3906 za vratena roba so Dare 50gr od Gega sto ne e zemeno od Aldako a sto bese konstantirano od strana na koleska Julia 1.125den","eur":18.29}],"clients":[{"seg":"KA - LKA","name":"KIPPER MARKET","sales_eur":488494.8,"leaflet":0.0,"positions":19539.79,"mktg_eur":19539.79,"pct":4.0},{"seg":"KA - LKA","name":"NETTO MARKET DOO","sales_eur":13746.58,"leaflet":162.6,"positions":406.5,"mktg_eur":569.11,"pct":4.14},{"seg":"KA - LKA","name":"ELKOS GROUP DOO","sales_eur":8422.96,"leaflet":0.0,"positions":600.0,"mktg_eur":600,"pct":7.12},{"seg":"KA - LKA","name":"A.M DOOEL","sales_eur":3126.3,"leaflet":0.0,"positions":156.31,"mktg_eur":156.31,"pct":5.0},{"seg":"KA - LKA","name":"FUTURA DOO","sales_eur":8889.83,"leaflet":0.0,"positions":528.46,"mktg_eur":528.46,"pct":5.94},{"seg":"KA - LKA","name":"ANGRO-MARKETING DOO","sales_eur":7603.49,"leaflet":0.0,"positions":406.5,"mktg_eur":406.5,"pct":5.35},{"seg":"KA - LKA","name":"SEMAFOR-KOMERC-R","sales_eur":2522.1,"leaflet":0.0,"positions":138.21,"mktg_eur":138.21,"pct":5.48},{"seg":"KA - LKA","name":"BALKOPROM DOOEL","sales_eur":4081.83,"leaflet":0.0,"positions":204.1,"mktg_eur":204.1,"pct":5.0},{"seg":"Supermarket","name":"DUKLA DOOEL","sales_eur":11808.82,"leaflet":0.0,"positions":487.8,"mktg_eur":487.8,"pct":4.13},{"seg":"Supermarket","name":"JIS-KOMPANI DOO DEBAR","sales_eur":9821.41,"leaflet":0.0,"positions":390.24,"mktg_eur":390.24,"pct":3.97},{"seg":"Supermarket","name":"GEGA DOOEL","sales_eur":10111.32,"leaflet":0.0,"positions":422.76,"mktg_eur":422.76,"pct":4.18},{"seg":"Supermarket","name":"EVROPA SAR DOOEL","sales_eur":6249.7,"leaflet":0.0,"positions":325.2,"mktg_eur":325.2,"pct":5.2},{"seg":"Supermarket","name":"BABUSH KOMPANI DOOEL","sales_eur":7492.83,"leaflet":0.0,"positions":268.29,"mktg_eur":268.29,"pct":3.58},{"seg":"Supermarket","name":"AMIR MARKET DOOEL","sales_eur":5680.98,"leaflet":0.0,"positions":219.51,"mktg_eur":219.51,"pct":3.86},{"seg":"Supermarket","name":"BONITA PLUS DOOEL","sales_eur":4430.45,"leaflet":0.0,"positions":195.12,"mktg_eur":195.12,"pct":4.4},{"seg":"Supermarket","name":"EKSTRA MARKET ALI TP","sales_eur":3677.65,"leaflet":0.0,"positions":162.6,"mktg_eur":162.6,"pct":4.42},{"seg":"Supermarket","name":"GOLDI SV DOOEL","sales_eur":3570.16,"leaflet":0.0,"positions":178.86,"mktg_eur":178.86,"pct":5.01},{"seg":"Supermarket","name":"BONITA PROM DOOEL","sales_eur":2071.56,"leaflet":0.0,"positions":81.3,"mktg_eur":81.3,"pct":3.92},{"seg":"Supermarket","name":"TUANA MARKET DOOEL","sales_eur":2682.01,"leaflet":0.0,"positions":138.21,"mktg_eur":138.21,"pct":5.15},{"seg":"Supermarket","name":"TOP FRES MARKET","sales_eur":1103.61,"leaflet":0.0,"positions":48.78,"mktg_eur":48.78,"pct":4.42},{"seg":"Supermarket","name":"KONSUM DOO","sales_eur":1303.04,"leaflet":0.0,"positions":65.04,"mktg_eur":65.04,"pct":4.99},{"seg":"Supermarket","name":"BEKO KOMERC SA","sales_eur":1742.32,"leaflet":0.0,"positions":81.3,"mktg_eur":81.3,"pct":4.67},{"seg":"Supermarket","name":"SULANI MARKET DOOEL","sales_eur":2023.3,"leaflet":0.0,"positions":101.17,"mktg_eur":101.17,"pct":5.0},{"seg":"Supermarket","name":"SVISS MARKET SELO","sales_eur":1179.76,"leaflet":0.0,"positions":58.99,"mktg_eur":58.99,"pct":5.0},{"seg":"TT","name":"SKAMPA DOOEL","sales_eur":2787.97,"leaflet":0.0,"positions":138.21,"mktg_eur":138.21,"pct":4.96},{"seg":"TT","name":"DELVINA DOOEL","sales_eur":2706.45,"leaflet":0.0,"positions":138.21,"mktg_eur":138.21,"pct":5.11},{"seg":"TT","name":"MENTOS DOOEL","sales_eur":2256.87,"leaflet":0.0,"positions":121.95,"mktg_eur":121.95,"pct":5.4},{"seg":"TT","name":"TIMI KOMERC F.L.P","sales_eur":2282.17,"leaflet":0.0,"positions":113.82,"mktg_eur":113.82,"pct":4.99},{"seg":"TT","name":"AMIGOS-2","sales_eur":1861.1,"leaflet":0.0,"positions":101.63,"mktg_eur":101.63,"pct":5.46},{"seg":"TT","name":"NEZIRI DOOEL","sales_eur":2339.8,"leaflet":0.0,"positions":121.95,"mktg_eur":121.95,"pct":5.21},{"seg":"TT","name":"JUPROM DOOEL","sales_eur":1754.64,"leaflet":0.0,"positions":97.56,"mktg_eur":97.56,"pct":5.56},{"seg":"TT","name":"FRES KOMPANI 2024","sales_eur":2006.4,"leaflet":0.0,"positions":121.95,"mktg_eur":121.95,"pct":6.08},{"seg":"TT","name":"BOSS-88 DOOEL","sales_eur":1558.24,"leaflet":0.0,"positions":89.43,"mktg_eur":89.43,"pct":5.74},{"seg":"TT","name":"BILKOM DOOEL","sales_eur":1535.4,"leaflet":0.0,"positions":81.3,"mktg_eur":81.3,"pct":5.3},{"seg":"TT","name":"RONDO TREJD DOOEL","sales_eur":2499.14,"leaflet":0.0,"positions":124.96,"mktg_eur":124.96,"pct":5.0}]},"Q2":{"summary":{"extra":2905.16,"marketing":25945.85,"total":28851.01,"sales":610078.35},"extra_items":[{"desc":"VIVA EXTRA TP - vo Q-2 za celna ke se isplati 4.500den","eur":73.17},{"desc":"ROJAL MARKET TP - vo Q-2 za 3 polisi vo celna ke se isplati 3.000den","eur":48.78},{"desc":"KOLS MARKET DOOEL - vo Q-2 za Eti stalaza ke se isplati 3.750den","eur":60.98},{"desc":"HAKIMKA TP - vo Q-2 za Celna ke se islpati 4.500den","eur":73.17},{"desc":"CENTAR DELIKATES DVA - vo Q-2 za Dare stalaza ke se isplati 3.500den (poradi prometot e namaleno 1.000den)","eur":56.91},{"desc":"ISTANBUL BEDIR HAN DOOEL - vo Q-2 za Stalaza Dare ke se isplati + 3.750den","eur":60.98},{"desc":"SEMAFOR KOMERC-R - vo Q-2 za Dare pozicia ke se isplati + 2.500den","eur":40.65},{"desc":"BALKOPROM DOOEL - vo Q-2 za Dare pozicia ke se isplati + 3.000den","eur":48.78},{"desc":"JIS KOMPANI DOO - vo Q-2 za Dare pozicia vo kasa ke se isplati + 7.250den","eur":117.89},{"desc":"GEGA DOOEL - vo Q-2 za Dare pozicia vo kasaite ke se isplati + 7.000den","eur":113.82},{"desc":"BABUS KOMPANI - vo Q-2 za Dare stalaza ke se isplati + 6.000den","eur":97.56},{"desc":"AMIR MARKET DOOEL - vo Q-2 za Dare pozicia ke se isplati + 6.000den","eur":97.56},{"desc":"BONITA PLUS DOOEL - vo Q-2 za Dare stalaza ke se iplati + 3.000den","eur":48.78},{"desc":"EKSTRA MARKET ALI TP - vo Q-2 za Dare pozicia ke se isplati + 5.000den","eur":81.3},{"desc":"GOLDI SV DOOEL - vo Q-2 za Dare pozicia ke se isplati + 2.500den","eur":40.65},{"desc":"In-Out - 1 - vo Kipper so Set Eti Dare Dark 220gr. 7.728kom. Za vo period 21.05.-27.05.2026 - Odb 5% od SenFood =  49.150den","eur":799.19},{"desc":"Flaer za Kurban Bajram 2026g. So Petit Beure 800gr.5.185kom za vo period 21.05.-27.05.2026 - Odb 5% od SenFood = 35.621den","eur":579.2},{"desc":"Akcia so Dare Thin 30gr (7.560kom - 18.725den). I Dare Bar Kokos 28gr. (8.424kom - 17.606den) Vo TT za vo period od 11.05.2026 do 30.06.2026 Odb 5% od SenFood vkupno = 36.331den","eur":590.75},{"desc":"Rondo Trejd Dooel vo Q-1 ne napravi faktura za marketing I ovaa suma od 124.96EUR ostana kako visak kaj nas, vo Q-2 ja minusirame za da bideme 0,00 kon Senkardes!!","eur":-124.96}],"clients":[{"seg":"KA - LKA","name":"KIPPER MARKET","sales_eur":486522.1,"leaflet":0.0,"positions":19460.88,"mktg_eur":19460.88,"pct":4.0},{"seg":"KA - LKA","name":"NETTO MARKET DOO","sales_eur":9893.23,"leaflet":162.6,"positions":325.2,"mktg_eur":487.8,"pct":4.93},{"seg":"KA - LKA","name":"ELKOS GROUP DOO","sales_eur":4252.01,"leaflet":0.0,"positions":406.5,"mktg_eur":406.5,"pct":9.56},{"seg":"KA - LKA","name":"A.M DOOEL","sales_eur":10057.39,"leaflet":0.0,"positions":502.86,"mktg_eur":502.86,"pct":5.0},{"seg":"KA - LKA","name":"FUTURA DOO","sales_eur":4696.43,"leaflet":0.0,"positions":325.2,"mktg_eur":325.2,"pct":6.92},{"seg":"KA - LKA","name":"ANGRO-MARKETING DOO","sales_eur":4397.22,"leaflet":0.0,"positions":325.2,"mktg_eur":325.2,"pct":7.4},{"seg":"KA - LKA","name":"SEMAFOR-KOMERC-R","sales_eur":5673.2,"leaflet":0.0,"positions":284.55,"mktg_eur":284.55,"pct":5.02},{"seg":"KA - LKA","name":"BALKOPROM DOOEL","sales_eur":2431.08,"leaflet":0.0,"positions":121.56,"mktg_eur":121.56,"pct":5.0},{"seg":"Supermarket","name":"DUKLA DOOEL","sales_eur":6959.51,"leaflet":0.0,"positions":406.5,"mktg_eur":406.5,"pct":5.84},{"seg":"Supermarket","name":"JIS-KOMPANI DOO DEBAR","sales_eur":7521.46,"leaflet":0.0,"positions":390.24,"mktg_eur":390.24,"pct":5.19},{"seg":"Supermarket","name":"GEGA DOOEL","sales_eur":11022.52,"leaflet":0.0,"positions":422.76,"mktg_eur":422.76,"pct":3.84},{"seg":"Supermarket","name":"EVROPA SAR DOOEL","sales_eur":4037.35,"leaflet":0.0,"positions":243.9,"mktg_eur":243.9,"pct":6.04},{"seg":"Supermarket","name":"BABUSH KOMPANI DOOEL","sales_eur":7112.37,"leaflet":0.0,"positions":268.29,"mktg_eur":268.29,"pct":3.77},{"seg":"Supermarket","name":"AMIR MARKET DOOEL","sales_eur":3142.73,"leaflet":0.0,"positions":121.95,"mktg_eur":121.95,"pct":3.88},{"seg":"Supermarket","name":"BONITA PLUS DOOEL","sales_eur":3198.61,"leaflet":0.0,"positions":113.82,"mktg_eur":113.82,"pct":3.56},{"seg":"Supermarket","name":"EKSTRA MARKET ALI TP","sales_eur":4079.05,"leaflet":0.0,"positions":178.86,"mktg_eur":178.86,"pct":4.38},{"seg":"Supermarket","name":"GOLDI SV DOOEL","sales_eur":3216.47,"leaflet":0.0,"positions":154.47,"mktg_eur":154.47,"pct":4.8},{"seg":"Supermarket","name":"BONITA PROM DOOEL","sales_eur":2899.04,"leaflet":0.0,"positions":146.34,"mktg_eur":146.34,"pct":5.05},{"seg":"Supermarket","name":"TUANA MARKET DOOEL","sales_eur":3092.04,"leaflet":0.0,"positions":162.6,"mktg_eur":162.6,"pct":5.26},{"seg":"Supermarket","name":"TOP FRES MARKET","sales_eur":1142.35,"leaflet":0.0,"positions":65.04,"mktg_eur":65.04,"pct":5.69},{"seg":"Supermarket","name":"BEKO KOMERC SA","sales_eur":1966.33,"leaflet":0.0,"positions":121.95,"mktg_eur":121.95,"pct":6.2},{"seg":"Supermarket","name":"SULANI MARKET DOOEL","sales_eur":1327.31,"leaflet":0.0,"positions":66.36,"mktg_eur":66.36,"pct":5.0},{"seg":"Supermarket","name":"SVISS MARKET SELO","sales_eur":1168.39,"leaflet":0.0,"positions":58.42,"mktg_eur":58.42,"pct":5.0},{"seg":"TT","name":"SKAMPA DOOEL","sales_eur":1649.9,"leaflet":0.0,"positions":113.82,"mktg_eur":113.82,"pct":6.9},{"seg":"TT","name":"DELVINA DOOEL","sales_eur":2880.94,"leaflet":0.0,"positions":162.6,"mktg_eur":162.6,"pct":5.64},{"seg":"TT","name":"MENTOS DOOEL","sales_eur":2276.59,"leaflet":0.0,"positions":121.95,"mktg_eur":121.95,"pct":5.36},{"seg":"TT","name":"TIMI KOMERC F.L.P","sales_eur":2495.04,"leaflet":0.0,"positions":113.82,"mktg_eur":113.82,"pct":4.56},{"seg":"TT","name":"AMIGOS-2","sales_eur":1912.25,"leaflet":0.0,"positions":101.63,"mktg_eur":101.63,"pct":5.31},{"seg":"TT","name":"NEZIRI MARKET LINDI","sales_eur":1691.21,"leaflet":0.0,"positions":105.69,"mktg_eur":105.69,"pct":6.25},{"seg":"TT","name":"JUPROM DOOEL","sales_eur":1909.72,"leaflet":0.0,"positions":97.56,"mktg_eur":97.56,"pct":5.11},{"seg":"TT","name":"FRES KOMPANI 2024","sales_eur":2078.29,"leaflet":0.0,"positions":121.95,"mktg_eur":121.95,"pct":5.87},{"seg":"TT","name":"BOSS-88 DOOEL","sales_eur":1669.25,"leaflet":0.0,"positions":89.43,"mktg_eur":89.43,"pct":5.36},{"seg":"TT","name":"BILKOM DOOEL","sales_eur":1706.97,"leaflet":0.0,"positions":81.3,"mktg_eur":81.3,"pct":4.76}]}},"imperijal":{"Q1":{"summary":{"extra":5344.55,"marketing":22575.17,"sales":429373.04,"total":27919.72},"extra_items":[{"desc":"Ramstore garage salles 04.02-15.02 ( Petit beure 1kg and Dare 250gr)","eur":209.95},{"desc":"Ramstore rama 29.01-18.02 Petit beure 370gr and Dare wafel 29gr.","eur":101.64},{"desc":"Petit beure subvention Ramstore (excel)","eur":163.58},{"desc":"Dare subvention (excel)","eur":125.93},{"desc":"Kit go Petit beure 400gr. 02.02-04.02","eur":19.58},{"desc":"Vero Pop kek mini 144gr. 28.01-11.02","eur":14.34},{"desc":"Ramstore Pop kek mini 144gr. 16.02-22.02","eur":147.59},{"desc":"Petit beure 400gr and 800gr subvention (excel)","eur":771.54},{"desc":"Reptil Pop kek mini 144gr 01.02-28.02","eur":43.63},{"desc":"Kit go Pop kek mini 144gr. 29.01-15.02","eur":151.72},{"desc":"Kit go Dare wafel 29gr. 10.02-13.02","eur":20.49},{"desc":"Kit go Petit beure 1kg 18.02-04.03","eur":63.85},{"desc":"Sen food podignata roba","eur":944.42},{"desc":"Ramstore Ramazan Petit beure 400gr. 12.02-12.03","eur":56.96},{"desc":"Dare 50gr PROMO","eur":1664.17},{"desc":"Dare bisc. coconut 33.5gr PROMO","eur":222.54},{"desc":"Dare 114gr PROMO","eur":71.69},{"desc":"Puf coconut PROMO","eur":31.57},{"desc":"Cin kakao and orange PROMO","eur":124.55},{"desc":"OMER kasi","eur":297.24},{"desc":"Ekspanda","eur":97.56}],"clients":[{"seg":"KA","name":"Kit-Go Viva Fresh","sales_eur":35329.51,"leaflet":0.0,"positions":2032.52,"mktg_eur":2032.52,"pct":5.75},{"seg":"KA","name":"Zito Veles","sales_eur":14347.27,"leaflet":0.0,"positions":1004.31,"mktg_eur":1004.31,"pct":7.0},{"seg":"KA","name":"Ramstor KA","sales_eur":29882.94,"leaflet":0.0,"positions":2390.63,"mktg_eur":2390.63,"pct":8.0},{"seg":"KA","name":"Tinex","sales_eur":21032.94,"leaflet":0.0,"positions":1472.29,"mktg_eur":1472.29,"pct":7.0},{"seg":"KA","name":"Vero KA","sales_eur":11256.85,"leaflet":0.0,"positions":844.26,"mktg_eur":844.26,"pct":7.5},{"seg":"KA","name":"KAM","sales_eur":115973.24,"leaflet":0.0,"positions":4638.93,"mktg_eur":4638.93,"pct":4.0},{"seg":"KA","name":"STOKOMAK","sales_eur":49456.73,"leaflet":0.0,"positions":1483.69,"mktg_eur":1483.69,"pct":3.0},{"seg":"KA","name":"Makpetrol","sales_eur":15573.98,"leaflet":0.0,"positions":813.01,"mktg_eur":813.01,"pct":5.22},{"seg":"KA","name":"Pucko Petrol","sales_eur":6393.4,"leaflet":0.0,"positions":487.8,"mktg_eur":487.8,"pct":7.63},{"seg":"EAST","name":"Dijana Marketi","sales_eur":4181.35,"leaflet":0.0,"positions":406.5,"mktg_eur":406.5,"pct":9.72},{"seg":"EAST","name":"TD - TD","sales_eur":2667.67,"leaflet":0.0,"positions":182.93,"mktg_eur":182.93,"pct":6.86},{"seg":"EAST","name":"Seljman Turizam","sales_eur":3994.03,"leaflet":0.0,"positions":199.67,"mktg_eur":199.67,"pct":5.0},{"seg":"EAST","name":"Crvena Ruza","sales_eur":8108.02,"leaflet":0.0,"positions":405.37,"mktg_eur":405.37,"pct":5.0},{"seg":"EAST","name":"DU - BO","sales_eur":1746.15,"leaflet":0.0,"positions":87.32,"mktg_eur":87.32,"pct":5.0},{"seg":"EAST","name":"Astra","sales_eur":1959.2,"leaflet":0.0,"positions":97.89,"mktg_eur":97.89,"pct":5.0},{"seg":"EAST","name":"ABH","sales_eur":1749.53,"leaflet":0.0,"positions":87.48,"mktg_eur":87.48,"pct":5.0},{"seg":"EAST","name":"Min-eks","sales_eur":4390.26,"leaflet":0.0,"positions":219.51,"mktg_eur":219.51,"pct":5.0},{"seg":"EAST","name":"Makom Tref","sales_eur":1082.91,"leaflet":0.0,"positions":54.15,"mktg_eur":54.15,"pct":5.0},{"seg":"EAST","name":"Musli Market","sales_eur":2396.07,"leaflet":0.0,"positions":97.56,"mktg_eur":97.56,"pct":4.07},{"seg":"SKOPJE","name":"Reptil","sales_eur":10148.05,"leaflet":0.0,"positions":507.32,"mktg_eur":507.32,"pct":5.0},{"seg":"SKOPJE","name":"Omer Kompani","sales_eur":9907.89,"leaflet":0.0,"positions":975.61,"mktg_eur":975.61,"pct":9.85},{"seg":"SKOPJE","name":"Trı Trgovcı","sales_eur":4755.37,"leaflet":0.0,"positions":237.72,"mktg_eur":237.72,"pct":5.0},{"seg":"SKOPJE","name":"Metro Holding","sales_eur":4541.04,"leaflet":0.0,"positions":406.5,"mktg_eur":406.5,"pct":8.95},{"seg":"SKOPJE","name":"Dia Center","sales_eur":6997.98,"leaflet":0.0,"positions":528.46,"mktg_eur":528.46,"pct":7.55},{"seg":"SKOPJE","name":"Super 2000","sales_eur":2619.19,"leaflet":0.0,"positions":130.89,"mktg_eur":130.89,"pct":5.0},{"seg":"SKOPJE","name":"Euro-Is","sales_eur":3594.54,"leaflet":0.0,"positions":292.68,"mktg_eur":292.68,"pct":8.14},{"seg":"SKOPJE","name":"Vord","sales_eur":8655.71,"leaflet":0.0,"positions":432.68,"mktg_eur":432.68,"pct":5.0},{"seg":"SKOPJE","name":"Astor","sales_eur":6150.5,"leaflet":0.0,"positions":307.48,"mktg_eur":307.48,"pct":5.0},{"seg":"SKOPJE","name":"Er Groz","sales_eur":8356.28,"leaflet":0.0,"positions":406.5,"mktg_eur":406.5,"pct":4.86},{"seg":"SKOPJE","name":"Jara tobako","sales_eur":1605.01,"leaflet":0.0,"positions":80.33,"mktg_eur":80.33,"pct":5.0},{"seg":"SKOPJE","name":"Dali-Er","sales_eur":2602.57,"leaflet":0.0,"positions":121.95,"mktg_eur":121.95,"pct":4.69},{"seg":"SKOPJE","name":"Gigo Trejd","sales_eur":1306.44,"leaflet":0.0,"positions":65.04,"mktg_eur":65.04,"pct":4.98},{"seg":"SKOPJE","name":"Reiser","sales_eur":3144.16,"leaflet":0.0,"positions":121.95,"mktg_eur":121.95,"pct":3.88},{"seg":"SKOPJE","name":"Master Inter","sales_eur":2283.67,"leaflet":0.0,"positions":114.15,"mktg_eur":114.15,"pct":5.0},{"seg":"SKOPJE","name":"MM grups","sales_eur":932.57,"leaflet":0.0,"positions":46.67,"mktg_eur":46.67,"pct":5.0},{"seg":"SKOPJE","name":"Bonita","sales_eur":1786,"leaflet":0.0,"positions":89.27,"mktg_eur":89.27,"pct":5.0},{"seg":"SKOPJE","name":"Moka","sales_eur":1042.49,"leaflet":0.0,"positions":52.11,"mktg_eur":52.11,"pct":5.0},{"seg":"SKOPJE","name":"Daldako","sales_eur":1332.72,"leaflet":0.0,"positions":66.67,"mktg_eur":66.67,"pct":5.0},{"seg":"SKOPJE","name":"Jatkom","sales_eur":4542.7,"leaflet":0.0,"positions":97.56,"mktg_eur":97.56,"pct":2.15},{"seg":"WEST","name":"Montenegro","sales_eur":11546.13,"leaflet":0.0,"positions":487.8,"mktg_eur":487.8,"pct":4.22}]},"Q2":{"summary":{"extra":3352.59,"marketing":22861.95,"sales":450923.53,"total":26214.54},"extra_items":[{"desc":"Petit beure subvention Ramstore (excel)","eur":90.67},{"desc":"Dare subvention (excel)","eur":214.88},{"desc":"Ramstore activities ( Crax cheese, Brauni 144gr and Dare 220gr.)","eur":105.3},{"desc":"Spar activities (Pop kek cacao 144gr., Petit beure 1kg, Tutku 120gr.)","eur":56.52},{"desc":"Ramstore activities (21.02-29.05.2026 Petit beure 400gr and 1kg)","eur":32.68},{"desc":"Dare coconut","eur":5.85},{"desc":"Dare dark 30gr.","eur":9.85},{"desc":"Ramstore (Pop kek cacao 45gr 7000 and Cin orange 7000)","eur":120.08},{"desc":"Industry service","eur":224.75},{"desc":"Sen food podignata roba","eur":1320.46},{"desc":"Reptil promotion","eur":162.6},{"desc":"Asstor promotion","eur":97.56},{"desc":"Zhito nagradna igra","eur":911.38}],"clients":[{"seg":"KA","name":"Kit-Go Viva Fresh","sales_eur":35136.52,"leaflet":0.0,"positions":0.0,"mktg_eur":2032.52,"pct":5.78},{"seg":"KA","name":"Zito Veles","sales_eur":17551.61,"leaflet":0.0,"positions":0.0,"mktg_eur":1228.62,"pct":7.0},{"seg":"KA","name":"Ramstor KA","sales_eur":26942.08,"leaflet":0.0,"positions":0.0,"mktg_eur":2155.28,"pct":8.0},{"seg":"KA","name":"Tinex","sales_eur":10030.21,"leaflet":0.0,"positions":0.0,"mktg_eur":702.11,"pct":7.0},{"seg":"KA","name":"Vero KA","sales_eur":12374.29,"leaflet":0.0,"positions":0.0,"mktg_eur":927.97,"pct":7.5},{"seg":"KA","name":"KAM","sales_eur":132317.95,"leaflet":0.0,"positions":0.0,"mktg_eur":5292.68,"pct":4.0},{"seg":"KA","name":"STOKOMAK","sales_eur":55016.07,"leaflet":0.0,"positions":0.0,"mktg_eur":1650.41,"pct":3.0},{"seg":"KA","name":"Makpetrol","sales_eur":25898.41,"leaflet":0.0,"positions":0.0,"mktg_eur":813.01,"pct":3.14},{"seg":"KA","name":"Pucko Petrol","sales_eur":7813.35,"leaflet":0.0,"positions":0.0,"mktg_eur":487.8,"pct":6.24},{"seg":"EAST","name":"Dijana Marketi","sales_eur":4433.82,"leaflet":0.0,"positions":0.0,"mktg_eur":406.5,"pct":9.17},{"seg":"EAST","name":"TD - TD","sales_eur":3094.47,"leaflet":0.0,"positions":0.0,"mktg_eur":182.93,"pct":5.91},{"seg":"EAST","name":"Seljman Turizam","sales_eur":4625.92,"leaflet":0.0,"positions":0.0,"mktg_eur":231.22,"pct":5.0},{"seg":"EAST","name":"Crvena Ruza","sales_eur":9286.52,"leaflet":0.0,"positions":0.0,"mktg_eur":464.23,"pct":5.0},{"seg":"EAST","name":"DU - BO","sales_eur":1873.09,"leaflet":0.0,"positions":0.0,"mktg_eur":93.66,"pct":5.0},{"seg":"EAST","name":"Astra","sales_eur":1824.44,"leaflet":0.0,"positions":0.0,"mktg_eur":91.06,"pct":4.99},{"seg":"EAST","name":"ABH","sales_eur":1908.98,"leaflet":0.0,"positions":0.0,"mktg_eur":95.45,"pct":5.0},{"seg":"EAST","name":"Min-eks","sales_eur":3803.54,"leaflet":0.0,"positions":0.0,"mktg_eur":190.08,"pct":5.0},{"seg":"EAST","name":"Makom Tref","sales_eur":1270.78,"leaflet":0.0,"positions":0.0,"mktg_eur":63.58,"pct":5.0},{"seg":"EAST","name":"Musli Market","sales_eur":180.31,"leaflet":0.0,"positions":0.0,"mktg_eur":97.56,"pct":54.11},{"seg":"SKOPJE","name":"Reptil","sales_eur":15200.11,"leaflet":0.0,"positions":0.0,"mktg_eur":760,"pct":5.0},{"seg":"SKOPJE","name":"Omer Kompani","sales_eur":10851.04,"leaflet":0.0,"positions":0.0,"mktg_eur":975.61,"pct":8.99},{"seg":"SKOPJE","name":"Trı Trgovcı","sales_eur":4320.13,"leaflet":0.0,"positions":0.0,"mktg_eur":215.93,"pct":5.0},{"seg":"SKOPJE","name":"Metro Holding","sales_eur":6061.3,"leaflet":0.0,"positions":0.0,"mktg_eur":406.5,"pct":6.71},{"seg":"SKOPJE","name":"Dia Center","sales_eur":7254.89,"leaflet":0.0,"positions":0.0,"mktg_eur":528.46,"pct":7.28},{"seg":"SKOPJE","name":"Super 2000","sales_eur":3902.78,"leaflet":0.0,"positions":0.0,"mktg_eur":195.12,"pct":5.0},{"seg":"SKOPJE","name":"Euro-Is","sales_eur":1734.63,"leaflet":0.0,"positions":0.0,"mktg_eur":292.68,"pct":16.87},{"seg":"SKOPJE","name":"Vord","sales_eur":1870.39,"leaflet":0.0,"positions":0.0,"mktg_eur":93.5,"pct":5.0},{"seg":"SKOPJE","name":"Astor","sales_eur":7400.2,"leaflet":0.0,"positions":0.0,"mktg_eur":369.92,"pct":5.0},{"seg":"SKOPJE","name":"Er Groz","sales_eur":8029.41,"leaflet":0.0,"positions":0.0,"mktg_eur":406.5,"pct":5.06},{"seg":"SKOPJE","name":"Jara tobako","sales_eur":1640.5,"leaflet":0.0,"positions":0.0,"mktg_eur":81.95,"pct":5.0},{"seg":"SKOPJE","name":"Dali-Er","sales_eur":2909.24,"leaflet":0.0,"positions":0.0,"mktg_eur":121.95,"pct":4.19},{"seg":"SKOPJE","name":"Gigo Trejd","sales_eur":1371.14,"leaflet":0.0,"positions":0.0,"mktg_eur":68.46,"pct":4.99},{"seg":"SKOPJE","name":"Reiser","sales_eur":4013.04,"leaflet":0.0,"positions":0.0,"mktg_eur":121.95,"pct":3.04},{"seg":"SKOPJE","name":"Master Inter","sales_eur":1787.15,"leaflet":0.0,"positions":0.0,"mktg_eur":89.43,"pct":5.0},{"seg":"SKOPJE","name":"MM grups","sales_eur":1086.73,"leaflet":0.0,"positions":0.0,"mktg_eur":54.31,"pct":5.0},{"seg":"SKOPJE","name":"Bonita","sales_eur":1582.16,"leaflet":0.0,"positions":0.0,"mktg_eur":79.02,"pct":4.99},{"seg":"SKOPJE","name":"Moka","sales_eur":1263.98,"leaflet":0.0,"positions":0.0,"mktg_eur":63.25,"pct":5.0},{"seg":"SKOPJE","name":"Daldako","sales_eur":956.39,"leaflet":0.0,"positions":0.0,"mktg_eur":47.8,"pct":5.0},{"seg":"SKOPJE","name":"Jatkom","sales_eur":3849.71,"leaflet":0.0,"positions":0.0,"mktg_eur":97.56,"pct":2.53},{"seg":"SKOPJE","name":"Ekspanda","sales_eur":587.9,"leaflet":0.0,"positions":0.0,"mktg_eur":97.56,"pct":16.59},{"seg":"WEST","name":"Montenegro","sales_eur":8456.23,"leaflet":0.0,"positions":0.0,"mktg_eur":487.8,"pct":5.77}]}}};
+var mkt2Dist = 'aldaco';
+var mkt2Q = 'Q1';
+
+function mfmt(n){ return Math.round(n).toLocaleString('en-US').replace(/,/g,'.'); }
+function mTr(k){ try{ return (TR[currentLang]&&TR[currentLang][k])||k; }catch(e){ return k; } }
+
+function showPage(p){
+  document.getElementById('salesPage').style.display = p==='sales' ? '' : 'none';
+  document.getElementById('marketingPage').style.display = p==='marketing' ? '' : 'none';
+  document.getElementById('pnav-sales').classList.toggle('active', p==='sales');
+  document.getElementById('pnav-mkt').classList.toggle('active', p==='marketing');
+  // hide period selector + search on marketing page (they belong to sales)
+  var ps = document.getElementById('periodSel'); if(ps) ps.style.display = p==='sales' ? '' : 'none';
+  if(p==='marketing') renderMkt2();
+}
+
+function setMktDist(d){
+  mkt2Dist = d;
+  document.querySelectorAll('.mkt-dsw').forEach(function(el){
+    var on = el.dataset.md===d;
+    el.classList.toggle('active', on);
+    if(on){ el.style.background = d==='aldaco' ? '#1d9e75' : '#d85a30'; el.style.color='#fff'; }
+    else { el.style.background=''; el.style.color=''; }
+  });
+  renderMkt2();
+}
+
+function setMkt2Q(q){
+  mkt2Q = q;
+  document.querySelectorAll('#mkt2Quarters .mth-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.mq===q); });
+  renderMkt2();
+}
+
+function mktCard(label, value, color, sub){
+  return '<div class="card"><div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">'+label+'</div>'+
+    '<div style="font-size:17px;font-weight:700;color:'+color+';font-variant-numeric:tabular-nums">'+value+'</div>'+
+    (sub?'<div style="font-size:10px;color:var(--tx3);margin-top:2px">'+sub+'</div>':'')+'</div>';
+}
+
+function renderMkt2(){
+  var d = MKT2[mkt2Dist][mkt2Q];
+  var s = d.summary;
+  var accent = mkt2Dist==='aldaco' ? '#1d9e75' : '#d85a30';
+  var pct = s.sales ? (s.marketing/s.sales*100) : 0;
+  var totalPct = s.sales ? (s.total/s.sales*100) : 0;
+  // Cards
+  document.getElementById('mkt2Cards').innerHTML =
+    mktCard(mTr('mkt_k_realized'), mfmt(s.marketing)+' €', 'var(--tx)', pct.toFixed(2)+'% '+mTr('mkt_of_sales')) +
+    mktCard(mTr('mkt_k_extra'), mfmt(s.extra)+' €', '#d97706', '') +
+    mktCard(mTr('mkt_k_total'), mfmt(s.total)+' €', accent, totalPct.toFixed(2)+'% '+mTr('mkt_of_sales')) +
+    mktCard(mTr('mkt_k_sales'), mfmt(s.sales)+' €', 'var(--tx)', '') +
+    mktCard(mTr('mkt_k_pct'), totalPct.toFixed(2)+' %', accent, '');
+  // Clients table (sorted by marketing desc)
+  var clients = d.clients.slice().sort(function(a,b){ return b.mktg_eur - a.mktg_eur; });
+  var tb = document.getElementById('mkt2Tbody');
+  tb.innerHTML = clients.map(function(c){
+    return '<tr>'+
+      '<td class="lft" style="font-weight:600">'+c.name+'</td>'+
+      '<td class="lft" style="color:var(--tx2);font-size:11px">'+c.seg+'</td>'+
+      '<td>'+mfmt(c.sales_eur)+'</td>'+
+      '<td>'+(c.leaflet?mfmt(c.leaflet):'—')+'</td>'+
+      '<td>'+(c.positions?mfmt(c.positions):'—')+'</td>'+
+      '<td style="font-weight:600">'+mfmt(c.mktg_eur)+'</td>'+
+      '<td style="color:'+accent+';font-weight:600">'+c.pct.toFixed(2)+'%</td>'+
+      '</tr>';
+  }).join('') +
+  '<tr style="background:var(--s2);font-weight:700"><td class="lft" data-i18n="total">ВКУПНО</td><td></td>'+
+    '<td>'+mfmt(s.sales)+'</td><td></td><td></td><td>'+mfmt(s.marketing)+'</td>'+
+    '<td style="color:'+accent+'">'+pct.toFixed(2)+'%</td></tr>';
+  // Extra items table (sorted by eur desc)
+  var extras = d.extra_items.slice().sort(function(a,b){ return b.eur - a.eur; });
+  var et = document.getElementById('mkt2Extra');
+  et.innerHTML = extras.map(function(x){
+    return '<tr><td class="lft">'+x.desc+'</td><td style="font-weight:600">'+x.eur.toFixed(2)+'</td></tr>';
+  }).join('') +
+  '<tr style="background:var(--s2);font-weight:700"><td class="lft" data-i18n="total">ВКУПНО</td><td style="color:#d97706">'+mfmt(s.extra)+'</td></tr>';
+}
+
 </script>
 </body>
 </html>
